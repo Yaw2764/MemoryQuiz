@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
 
 export default function App() {
 	const [currentQuestion, setCurrentQuestion] = useState(0);
 	const [score, setScore] = useState(0);
+	const countdown = 5;
+	const [showScore, setShowScore] = useState(false);
+	const [counter, setCounter] = useState(countdown);
 
 	const questions = [
 		{
@@ -43,13 +47,15 @@ export default function App() {
 		},
 	];
 	const handleAnswerButtonClick = (isCorrect) => {
-		if(isCorrect){
+		if(isCorrect && counter >0){
 			setScore(score + 1);
 		}
 		const nextQuestion = currentQuestion + 1;
 		setCurrentQuestion(nextQuestion);
 		if (nextQuestion < questions.length) {
 			setCurrentQuestion(nextQuestion);
+			setCounter(countdown);
+
 		} else {
 			setShowScore(true);
 		}
@@ -59,11 +65,19 @@ export default function App() {
 		setScore(0);
 		setCurrentQuestion(0);
 		setShowScore(false);
-
+		clearInterval(counter);
 		
 	};
 
-	const [showScore, setShowScore] = useState(false);
+	
+
+    useEffect(()=>{
+        if (counter >0){
+            setTimeout(()=> setCounter(counter - 1), 1000); 
+        }
+
+
+    },[counter])
 
 	return (
 		<div className='app'>
@@ -81,6 +95,8 @@ export default function App() {
 					<div className='question-section'>
 						<div className='question-count'>
 							<span>Question {currentQuestion + 1}</span>/{questions.length}
+							<BasicTimer></BasicTimer>
+							{counter}
 						</div>
 						<div className='question-text'>{questions[currentQuestion].questionText}</div>
 					</div>
