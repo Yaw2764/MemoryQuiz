@@ -1,11 +1,161 @@
 import React, { useState, useEffect, Component } from 'react';
+import Timer from './Timer';
+
  
+function Apppp() {
+	const [currentQuestion, setCurrentQuestion] = useState(0);
+	const [seconds, setSeconds] = useState(0);
+	
+	const [score, setScore] = useState(0);
+	const countdown = 10;
+	const [counter, setCounter] = useState(countdown);
+	const [page, setPage] = useState('menu')
+
+
+	const questions = [
+		{
+			questionText: 'What is the capital of France?',
+			answerOptions: [
+				{ answerText: 'New York', isCorrect: false },
+				{ answerText: 'London', isCorrect: false },
+				{ answerText: 'Paris', isCorrect: true },
+				{ answerText: 'Dublin', isCorrect: false },
+			],
+		},
+		{
+			questionText: 'Who is CEO of Tesla?',
+			answerOptions: [
+				{ answerText: 'Jeff Bezos', isCorrect: false },
+				{ answerText: 'Elon Musk', isCorrect: true },
+				{ answerText: 'Bill Gates', isCorrect: false },
+				{ answerText: 'Tony Stark', isCorrect: false },
+			],
+		},
+		{
+			questionText: 'The iPhone was created by which company?',
+			answerOptions: [
+				{ answerText: 'Apple', isCorrect: true },
+				{ answerText: 'Intel', isCorrect: false },
+				{ answerText: 'Amazon', isCorrect: false },
+				{ answerText: 'Microsoft', isCorrect: false },
+			],
+		},
+		{
+			questionText: 'How many Harry Potter books are there?',
+			answerOptions: [
+				{ answerText: '1', isCorrect: false },
+				{ answerText: '4', isCorrect: false },
+				{ answerText: '6', isCorrect: false },
+				{ answerText: '7', isCorrect: true },
+			],
+		},
+	];
+	const handleAnswerButtonClick = (isCorrect) => {
+		if(isCorrect && seconds >0){
+			setScore(score + 1);
+		}
+		const nextQuestion = currentQuestion + 1;
+		setCurrentQuestion(nextQuestion);
+		if (nextQuestion < questions.length) {
+			setCurrentQuestion(nextQuestion);
+			setSeconds(countdown);
+
+		} else {
+			setPage("Score");
+		}
+	};
+
+	const handleResetClick = () => {
+		setScore(0);
+		setCurrentQuestion(0);
+		setCounter(-10);
+		setPage("Menu");
+		
+	};
+
+	const handleStartFromMenu = () => {
+		setScore(0);
+		setCurrentQuestion(0);
+		clearInterval(counter);
+		setCounter(-10);
+		setSeconds(countdown);
+		setPage("Question");
+		
+	};
+	const qRandomizer =(list)=>{
+		const slist = list[Math.floor(Math.random() * list.length)];
+
+		return slist;
+	}
+
+	
+
+    useEffect(()=>{
+        //if (counter >0){
+          //  setTimeout(()=> setCounter(counter - 1), 1000); 
+        //}
+		let interval = null;
+		if (seconds > 0) {
+		interval = setInterval(() => {
+			setSeconds(seconds => seconds - 1);
+		}, 1000);
+		} else {
+		clearInterval(interval);
+		}
+		return () => clearInterval(interval);
+	}, [seconds]);
+
+
+    //},[counter])
+
+
+	return (
+		<div className='app'>
+			
+
+{(() => {
+        switch (page) {
+          case 'Question':
+            return <div><div className='question-section'>
+			<div className='question-count'>
+			<div>{seconds} seconds left</div>
+				<span>Question {currentQuestion + 1}</span>/{questions.length}
+				
+			</div>
+			<div className='question-text'>{questions[currentQuestion].questionText}</div>
+		</div>
+		<div className='answer-section'>
+			{questions[currentQuestion].answerOptions.map((answerOption,index) =>
+			(<button onClick={() => handleAnswerButtonClick(answerOption.isCorrect)}>{answerOption.answerText}</button>))}
+		</div></div>
+
+          case 'Score':
+            return <div><div className='score-section'>You scored {score} out of {questions.length}
+			<button onClick={() => handleResetClick()}>Reset</button>
+			
+			</div></div>
+         
+          default:
+            return <div className='score-section'>This is the Menu
+			<button onClick={() => handleStartFromMenu()}>Start</button>
+			</div>
+        }
+      })()}
+			
+
+
+
+		</div>
+	);
+}
+
+
 
 function Appp() {
 	const [currentQuestion, setCurrentQuestion] = useState(0);
+	
 	const [score, setScore] = useState(0);
-	const countdown = 5;
-	const [showScore, setShowScore] = useState(false);
+	const countdown = 10;
 	const [counter, setCounter] = useState(countdown);
 	const [page, setPage] = useState('menu')
 
@@ -66,8 +216,7 @@ function Appp() {
 	const handleResetClick = () => {
 		setScore(0);
 		setCurrentQuestion(0);
-		setShowScore(false);
-		clearInterval(counter);
+		setCounter(-10);
 		setPage("Menu");
 		
 	};
@@ -75,11 +224,17 @@ function Appp() {
 	const handleStartFromMenu = () => {
 		setScore(0);
 		setCurrentQuestion(0);
-		setShowScore(false);
 		clearInterval(counter);
+		setCounter(-10);
+		setCounter(countdown);
 		setPage("Question");
 		
 	};
+	const qRandomizer =(list)=>{
+		const slist = list[Math.floor(Math.random() * list.length)];
+
+		return slist;
+	}
 
 	
 
@@ -94,6 +249,7 @@ function Appp() {
 
 	return (
 		<div className='app'>
+			<Timer seconds={30} />
 
 {(() => {
         switch (page) {
@@ -127,29 +283,6 @@ function Appp() {
 
 
 
-			{/* {showScore ? (
-				<div className='score-section'>You scored {score} out of {questions.length}
-				<button onClick={() => handleResetClick()}>Reset</button>
-				
-				</div>
-				
-
-			) : (
-				<>
-					<div className='question-section'>
-						<div className='question-count'>
-							<span>Question {currentQuestion + 1}</span>/{questions.length}
-							
-							{counter}
-						</div>
-						<div className='question-text'>{questions[currentQuestion].questionText}</div>
-					</div>
-					<div className='answer-section'>
-						{questions[currentQuestion].answerOptions.map((answerOption,index) =>
-						(<button onClick={() => handleAnswerButtonClick(answerOption.isCorrect)}>{answerOption.answerText}</button>))}
-					</div>
-				</>
-			)} */}
 		</div>
 	);
 }
@@ -200,7 +333,7 @@ function App() {
 			],
 		},
 	];
-	const handleAnswerButtonClick = (isCorrect) => {
+	const handleAnswerButtonClick = (isCorrect,counter) => {
 		if(isCorrect && counter >0){
 			setScore(score + 1);
 		}
@@ -215,11 +348,13 @@ function App() {
 		}
 	};
 
+
 	const handleResetClick = () => {
 		setScore(0);
 		setCurrentQuestion(0);
 		setShowScore(false);
-		clearInterval(counter);
+		setCounter(-10);
+		setCounter(countdown);
 		
 	};
 
@@ -254,11 +389,11 @@ function App() {
 					</div>
 					<div className='answer-section'>
 						{questions[currentQuestion].answerOptions.map((answerOption,index) =>
-						(<button onClick={() => handleAnswerButtonClick(answerOption.isCorrect)}>{answerOption.answerText}</button>))}
+						(<button onClick={() => handleAnswerButtonClick(answerOption.isCorrect,counter)}>{answerOption.answerText}</button>))}
 					</div>
 				</>
 			)}
 		</div>
 	);
 }
-export default Appp;
+export default Apppp;
